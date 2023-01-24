@@ -11,7 +11,7 @@ from pystray import MenuItem as item
 import PIL
 from PIL import Image, ImageTk
 import threading
-
+import sys
 
 info = subprocess.STARTUPINFO()
 info.dwFlags = subprocess.STARTF_USESHOWWINDOW
@@ -24,17 +24,20 @@ ip_trust = set()
 root = tk.Tk()
 root.withdraw()
 
-def on_exit():
-    print("Exiting...")
-    tray.stop()
-    exit()
+tray = None
 
 def start_background_icon():
+    global tray
     icon = Image.open("down.ico")
     menu = pystray.Menu(pystray.MenuItem("Exit", on_exit))
     tray = pystray.Icon("MyApp", icon, menu=menu)
     tray.run()
 
+def on_exit():
+    print("Exiting...")
+    tray.stop()
+    exit()
+    
 icon_thread = threading.Thread(target=start_background_icon)
 icon_thread.start()
 
