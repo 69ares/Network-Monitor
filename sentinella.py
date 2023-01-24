@@ -5,6 +5,13 @@ import time
 import ipaddress
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+from win10toast import ToastNotifier
+import pystray
+from pystray import MenuItem as item
+import PIL
+from PIL import Image, ImageTk
+import threading
+
 
 info = subprocess.STARTUPINFO()
 info.dwFlags = subprocess.STARTF_USESHOWWINDOW
@@ -16,11 +23,26 @@ ip_trust = set()
 
 root = tk.Tk()
 root.withdraw()
-#API_KEY = ""
-API_KEY = simpledialog.askstring("API KEY", "Inserisci la tua API KEY:", parent=root)
+
+def on_exit():
+    print("Exiting...")
+    tray.stop()
+    exit()
+
+def start_background_icon():
+    icon = Image.open("down.ico")
+    menu = pystray.Menu(pystray.MenuItem("Exit", on_exit))
+    tray = pystray.Icon("MyApp", icon, menu=menu)
+    tray.run()
+
+icon_thread = threading.Thread(target=start_background_icon)
+icon_thread.start()
+
+API_KEY = "acb46c46d9410d98666c98df5e5b1c1b9797a4f51c6e22220dc73292d6983904e01a6a9686032976"
+#API_KEY = simpledialog.askstring("API KEY", "Inserisci la tua API KEY:", parent=root)
 THRESHOLD = simpledialog.askinteger("THRESHOLD", "Inserisci il valore dello score:", parent=root)
 
-def check_ip(ip, process, pid):
+def check_ip(ip, process, pid): 
     try:
         ip_address = ipaddress.ip_address(ip.split(':')[0])
         if ip_address.is_private:
@@ -82,3 +104,6 @@ while True:
         for ip in first_ips:
             f.write(ip + "\n")
     time.sleep(10)
+    
+
+
